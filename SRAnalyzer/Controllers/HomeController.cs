@@ -4,34 +4,45 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using SRAnalyzer.Models;
+using SRAnalyzer.Models.ScoreItemsModels;
+using SRAnalyzerLibrary;
+using SRAnalyzerLibrary.Repositories;
 
 namespace SRAnalyzer.Controllers
 {
     public class HomeController : Controller
     {
+        private UnitOfWork unit;
+
+        public HomeController(IRepository<Player> playerRepository, IRepository<ScoreItem> scoreRepository)
+        {
+            unit = new UnitOfWork(playerRepository, scoreRepository);
+        }
+
         public IActionResult Index()
         {
-            return View();
+            MainPageViewModel model = unit.GetMainPageView();
+
+            return View(model);
         }
 
-        public IActionResult About()
+        public IActionResult AddScores()
         {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
+            ViewBag.PlayersList = unit.GetPlayersSelectList();
+            return View("AddScoresView");
         }
 
-        public IActionResult Contact()
+        [HttpPost]
+        public IActionResult AddScores(AddBatchScoreModel model)
         {
-            ViewData["Message"] = "Your contact page.";
+            if (model.PlayerId != 0)
+            {
+                unit.AddBatchOfScores(model);
+            }
 
-            return View();
-        }
-
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return RedirectToAction("Index");
         }
     }
 }

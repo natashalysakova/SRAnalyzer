@@ -1,0 +1,12 @@
+﻿@using Microsoft.ApplicationInsights.AspNetCore
+@model SRAnalyzer.Models.ScoreItemsModels.AddBatchScoreModel
+@{
+    ViewData["Title"] = "AddScoresView";
+}
+<h2>AddScoresView</h2>
+<form asp-action="AddScores" method="post" >
+    <select name="PlayerId" asp-for="PlayerId" asp-items="@ViewBag.PlayersList"></select>
+    <input type="text" id="datetimepicker" asp-for="DateTime">
+    <textarea asp-for="Scores" name="Scores"></textarea>
+    <button type="submit">Add</button>
+</form>
